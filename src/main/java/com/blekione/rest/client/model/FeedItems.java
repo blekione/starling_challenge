@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.Set;
 
 public class FeedItems {
-    Set<FeedItem> feedItems;
+    private Set<FeedItem> feedItems;
 
     // required by the JSON processor
     public FeedItems() {

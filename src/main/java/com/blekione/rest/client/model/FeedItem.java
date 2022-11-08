@@ -4,30 +4,30 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class FeedItem {
-    String feedItemUid;
-    String categoryUid;
-    CurrencyAndAmount amount;
-    CurrencyAndAmount sourceAmount;
-    String direction;
-    LocalDateTime updatedAt;
-    LocalDateTime transactionTime;
-    LocalDateTime settlementTime;
-    String source;
-    String status;
-    String transactingApplicationUserUid;
-    String counterPartyType;
-    String counterPartyUid;
-    String counterPartyName;
-    String counterPartySubEntityUid;
-    String counterPartySubEntityName;
-    String counterPartySubEntityIdentifier;
-    String counterPartySubEntitySubIdentifier;
-    String reference;
-    String country;
-    String spendingCategory;
-    Boolean hasAttachment;
-    Boolean hasReceipt;
-    Boolean batchPaymentDetails;
+    private String feedItemUid;
+    private String categoryUid;
+    private CurrencyAndAmount amount;
+    private CurrencyAndAmount sourceAmount;
+    private String direction;
+    private LocalDateTime updatedAt;
+    private LocalDateTime transactionTime;
+    private LocalDateTime settlementTime;
+    private String source;
+    private String status;
+    private String transactingApplicationUserUid;
+    private String counterPartyType;
+    private String counterPartyUid;
+    private String counterPartyName;
+    private String counterPartySubEntityUid;
+    private String counterPartySubEntityName;
+    private String counterPartySubEntityIdentifier;
+    private String counterPartySubEntitySubIdentifier;
+    private String reference;
+    private String country;
+    private String spendingCategory;
+    private Boolean hasAttachment;
+    private Boolean hasReceipt;
+    private Boolean batchPaymentDetails;
 
     public FeedItem(String feedItemUid, String categoryUid, CurrencyAndAmount amount, CurrencyAndAmount sourceAmount,
             String direction, LocalDateTime updatedAt, LocalDateTime transactionTime, LocalDateTime settlementTime,

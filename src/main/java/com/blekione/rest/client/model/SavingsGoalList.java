@@ -1,11 +1,12 @@
 package com.blekione.rest.client.model;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class SavingsGoalList {
 
-    List<SavingsGoal> savingsGoalList;
+    private List<SavingsGoal> savingsGoalList = new ArrayList<SavingsGoal>();
 
     // required by JSON porcessor
     public SavingsGoalList() {

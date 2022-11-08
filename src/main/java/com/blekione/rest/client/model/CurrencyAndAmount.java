@@ -4,8 +4,8 @@ import java.math.BigInteger;
 import java.util.Objects;
 
 public class CurrencyAndAmount {
-    String currency;
-    BigInteger minorUnits;
+    private String currency;
+    private BigInteger minorUnits;
 
     public CurrencyAndAmount(String currency, BigInteger minorUnits) {
         super();

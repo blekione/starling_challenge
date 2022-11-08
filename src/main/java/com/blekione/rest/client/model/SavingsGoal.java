@@ -3,11 +3,11 @@ package com.blekione.rest.client.model;
 import java.util.Objects;
 
 public class SavingsGoal {
-    String savingsGoalUid;
-    String name;
-    CurrencyAndAmount target;
-    CurrencyAndAmount totalSaved;
-    int savedPercentage;
+    private String savingsGoalUid;
+    private String name;
+    private CurrencyAndAmount target;
+    private CurrencyAndAmount totalSaved;
+    private int savedPercentage;
 
     // required by JSON processor
     public SavingsGoal() {
