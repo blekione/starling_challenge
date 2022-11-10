@@ -2,6 +2,7 @@ package com.blekione.rest.client;
 
 import java.util.concurrent.CompletionStage;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -17,6 +18,7 @@ import com.blekione.rest.client.model.FeedItems;
 @Path("/feed")
 @RegisterRestClient(configKey = "starling-feed")
 @RegisterClientHeaders(StarlingApiHeadersFactory.class)
+@ApplicationScoped
 public interface StarlingFeedService {
 
     @GET

@@ -2,14 +2,24 @@ package com.blekione.testutils;
 
 import java.math.BigInteger;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import com.blekione.rest.client.model.Balance;
+import com.blekione.rest.client.model.CreateOrUpdateSavingsGoalResponse;
 import com.blekione.rest.client.model.CurrencyAndAmount;
+import com.blekione.rest.client.model.ErrorDetail;
 import com.blekione.rest.client.model.FeedItem;
 import com.blekione.rest.client.model.FeedItems;
 import com.blekione.rest.client.model.SavingsGoal;
+import com.blekione.rest.client.model.SavingsGoalList;
+import com.blekione.rest.client.model.SavingsGoalRequest;
+import com.blekione.rest.client.model.SavingsGoalTransferResponse;
+import com.blekione.rest.client.model.TopUpRequest;
 
 /**
  * Test items builders.
@@ -25,7 +35,19 @@ public class A {
 
     public static CurrencyAndAmountBuilder currencyAndAmount = new CurrencyAndAmountBuilder();
 
-    public static SavingGoalBuilder savingGoal = new SavingGoalBuilder();
+    public static SavingsGoalListBuilder savingsGoalList = new SavingsGoalListBuilder();
+
+    public static SavingsGoalBuilder savingsGoal = new SavingsGoalBuilder();
+
+    public static SavingsGoalRequestBuilder savingsGoalRequest = new SavingsGoalRequestBuilder();
+
+    public static CreateOrUpdateSavingsGoalResponseBuilder createOrUpdateSavingsGoalResponse = new CreateOrUpdateSavingsGoalResponseBuilder();
+
+    public static TopUpRequestBuilder topUpRequest = new TopUpRequestBuilder();
+
+    public static SavingsGoalTransferResponseBuilder savingsGoalTransferResponse = new SavingsGoalTransferResponseBuilder();
+
+    public static BalanceBuilder balance = new BalanceBuilder();
 
     public static class FeedItemsBuilder {
         Set<FeedItem> feedItems = new HashSet<>();
@@ -120,6 +142,15 @@ public class A {
             return this;
         }
 
+        public FeedItemBuilder w(long minorUnits) {
+            return w("GBP", BigInteger.valueOf(minorUnits));
+        }
+
+        public FeedItemBuilder w(LocalDateTime trasactionTime) {
+            this.transactionTime = trasactionTime;
+            return this;
+        }
+
         public FeedItemBuilder w(String currency, BigInteger minorUnits) {
             this.amount = new CurrencyAndAmount(currency, minorUnits);
             this.sourceAmount = new CurrencyAndAmount(currency, minorUnits);
@@ -140,20 +171,20 @@ public class A {
 
     }
 
-    public static class SavingGoalBuilder {
+    public static class SavingsGoalBuilder {
         String savingGoalUid;
         String name;
         CurrencyAndAmount target;
         CurrencyAndAmount totalSaved;
         int savedPercentage;
 
-        SavingGoalBuilder() {
+        public SavingsGoalBuilder() {
             this("5b9fab8e-cbbc-4fd6-a3bb-8728ebf4ba1d", "For a car",
                     new CurrencyAndAmount("GBP", BigInteger.valueOf(10_000_00L)),
                     new CurrencyAndAmount("GBP", BigInteger.valueOf(200_00L)), 2);
         }
 
-        SavingGoalBuilder(String savingGoalUid, String name, CurrencyAndAmount target, CurrencyAndAmount totalSaved,
+        SavingsGoalBuilder(String savingGoalUid, String name, CurrencyAndAmount target, CurrencyAndAmount totalSaved,
                 int savedPercentage) {
             this.savingGoalUid = savingGoalUid;
             this.name = name;
@@ -162,24 +193,178 @@ public class A {
             this.savedPercentage = savedPercentage;
         }
 
-        public SavingGoalBuilder w(String savingGoalUid, String name) {
+        public SavingsGoalBuilder w(String savingGoalUid, String name) {
             this.savingGoalUid = savingGoalUid;
             this.name = name;
             return this;
         }
 
-        public SavingGoalBuilder wTarget(String currency, BigInteger minorUnits) {
+        public SavingsGoalBuilder wTarget(String currency, BigInteger minorUnits) {
             this.target = new CurrencyAndAmount(currency, minorUnits);
             return this;
         }
 
-        public SavingGoalBuilder wTotalSaved(String currency, BigInteger minorUnits) {
+        public SavingsGoalBuilder wTotalSaved(String currency, BigInteger minorUnits) {
             this.totalSaved = new CurrencyAndAmount(currency, minorUnits);
             return this;
         }
 
         public SavingsGoal build() {
             return new SavingsGoal(this.savingGoalUid, this.name, this.target, this.totalSaved, this.savedPercentage);
+        }
+    }
+
+    public static class SavingsGoalListBuilder {
+        private List<SavingsGoal> savingsGoalList = new ArrayList<SavingsGoal>();
+
+        public SavingsGoalListBuilder() {
+            this(new SavingsGoalBuilder().build());
+        }
+
+        SavingsGoalListBuilder(SavingsGoal... savingsGoals) {
+            this(new ArrayList<SavingsGoal>(Arrays.asList(savingsGoals)));
+        }
+
+        SavingsGoalListBuilder(List<SavingsGoal> savingsGoalsList) {
+            this.savingsGoalList = savingsGoalsList;
+        }
+
+        public SavingsGoalListBuilder w(SavingsGoal savingGoal) {
+            savingsGoalList.add(savingGoal);
+            return this;
+        }
+
+        public SavingsGoalList build() {
+            return new SavingsGoalList(this.savingsGoalList);
+        }
+
+    }
+
+    public static class SavingsGoalRequestBuilder {
+        private String name;
+        private String currency;
+        private CurrencyAndAmount target;
+
+        SavingsGoalRequestBuilder() {
+            this("test goal", "GBP", new CurrencyAndAmount("GBP", BigInteger.valueOf(200_00)));
+        }
+
+        SavingsGoalRequestBuilder(String name, String currency, CurrencyAndAmount target) {
+            this.name = name;
+            this.currency = currency;
+            this.target = target;
+        }
+
+        public SavingsGoalRequestBuilder w(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public SavingsGoalRequest build() {
+            return new SavingsGoalRequest(this.name, this.currency, this.target);
+        }
+    }
+
+    public static class CreateOrUpdateSavingsGoalResponseBuilder {
+        private String savingsGoalUid;
+        private boolean success;
+        private List<ErrorDetail> errors = new ArrayList<>();
+
+        CreateOrUpdateSavingsGoalResponseBuilder() {
+            this("b76311af-a8ee-4a7c-9e34-42da8c2e7bcb", true, Collections.emptyList());
+        }
+
+        CreateOrUpdateSavingsGoalResponseBuilder(String savingsGoalUid, boolean success, List<ErrorDetail> errors) {
+            this.savingsGoalUid = savingsGoalUid;
+            this.success = success;
+            this.errors = errors;
+        }
+
+        public CreateOrUpdateSavingsGoalResponse build() {
+            return new CreateOrUpdateSavingsGoalResponse(this.savingsGoalUid, this.success, this.errors);
+        }
+    }
+
+    public static class TopUpRequestBuilder {
+        private CurrencyAndAmount amount;
+
+        TopUpRequestBuilder() {
+            this(new CurrencyAndAmount("GBP", BigInteger.valueOf(10)));
+        }
+
+        TopUpRequestBuilder(CurrencyAndAmount amount) {
+            this.amount = amount;
+        }
+
+        public TopUpRequestBuilder w(long amount) {
+            this.amount = new CurrencyAndAmount("GBP", BigInteger.valueOf(amount));
+            return this;
+        }
+
+        public TopUpRequest build() {
+            return new TopUpRequest(amount);
+        }
+    }
+
+    public static class SavingsGoalTransferResponseBuilder {
+        private String transferUid;
+        private boolean success;
+        private List<ErrorDetail> errors;
+
+        SavingsGoalTransferResponseBuilder() {
+            this("aaa-bbb-111", true, new ArrayList<ErrorDetail>());
+        }
+
+        SavingsGoalTransferResponseBuilder(String transferUid, boolean success, ArrayList<ErrorDetail> errors) {
+            this.transferUid = transferUid;
+            this.success = success;
+            this.errors = errors;
+        }
+
+        public SavingsGoalTransferResponse build() {
+            return new SavingsGoalTransferResponse(this.transferUid, this.success, this.errors);
+        }
+    }
+
+    public static class BalanceBuilder {
+        private CurrencyAndAmount clearedBalance;
+        private CurrencyAndAmount effectiveBalance;
+        private CurrencyAndAmount pendingTransactions;
+        private CurrencyAndAmount acceptedOverdraft;
+        private CurrencyAndAmount amount;
+        private CurrencyAndAmount totalClearedBalance;
+        private CurrencyAndAmount totoalEffectiveBalance;
+
+        BalanceBuilder() {
+            this(new CurrencyAndAmount("GBP", BigInteger.valueOf(254277)),
+                    new CurrencyAndAmount("GBP", BigInteger.valueOf(254277)),
+                    new CurrencyAndAmount("GBP", BigInteger.valueOf(0)),
+                    new CurrencyAndAmount("GBP", BigInteger.valueOf(0)),
+                    new CurrencyAndAmount("GBP", BigInteger.valueOf(254277)),
+                    new CurrencyAndAmount("GBP", BigInteger.valueOf(254287)),
+                    new CurrencyAndAmount("GBP", BigInteger.valueOf(254287)));
+        }
+
+        BalanceBuilder(CurrencyAndAmount clearedBalance, CurrencyAndAmount effectiveBalance,
+                CurrencyAndAmount pendingTransactions, CurrencyAndAmount acceptedOverdraft, CurrencyAndAmount amount,
+                CurrencyAndAmount totalClearedBalance, CurrencyAndAmount totoalEffectiveBalance) {
+            this.clearedBalance = clearedBalance;
+            this.effectiveBalance = effectiveBalance;
+            this.pendingTransactions = pendingTransactions;
+            this.acceptedOverdraft = acceptedOverdraft;
+            this.amount = amount;
+            this.totalClearedBalance = totalClearedBalance;
+            this.totoalEffectiveBalance = totoalEffectiveBalance;
+        }
+
+        public BalanceBuilder wEffective(long effectiveBalance) {
+            this.effectiveBalance = new CurrencyAndAmount("GBP", BigInteger.valueOf(effectiveBalance));
+            return this;
+        }
+
+        public Balance build() {
+            return new Balance(this.clearedBalance, this.effectiveBalance, this.pendingTransactions,
+                    this.acceptedOverdraft, this.amount, this.totalClearedBalance, this.totoalEffectiveBalance);
         }
     }
 }

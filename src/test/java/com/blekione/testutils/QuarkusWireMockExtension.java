@@ -4,11 +4,13 @@ import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
 import static com.github.tomakehurst.wiremock.client.WireMock.containing;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
 import static com.github.tomakehurst.wiremock.client.WireMock.notContaining;
+import static com.github.tomakehurst.wiremock.client.WireMock.put;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathEqualTo;
 
 import java.util.Map;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
@@ -153,6 +155,73 @@ public class QuarkusWireMockExtension implements QuarkusTestResourceLifecycleMan
                 .willReturn(aResponse().withHeader("Content-Type", "application/json").withStatus(200)
                         .withBody("{"
                                 + "    \"savingsGoalList\": []"
+                                + "}")));
+        wireMockServer.stubFor(put(urlPathEqualTo(
+                "/account/61ca3b12-33f0-47fd-a3be-7db27e10cffa/savings-goals"))
+                .withRequestBody(WireMock.equalToJson("{"
+                        + "\"name\": \"test goal\","
+                        + "\"currency\": \"GBP\","
+                        + "\"target\": {"
+                        + "  \"currency\":\"GBP\","
+                        + "  \"minorUnits\": 20000"
+                        + "  }"
+                        + "}"))
+                .withHeader("Authorization", containing("Bearer bearerKey"))
+                .willReturn(aResponse().withHeader("Content-Type", "application/json").withStatus(200)
+                        .withBody("{"
+                                + "  \"savingsGoalUid\": \"b76311af-a8ee-4a7c-9e34-42da8c2e7bcb\","
+                                + "  \"success\": true,"
+                                + "  \"errors\": []"
+                                + "}")));
+
+        wireMockServer.stubFor(put(urlPathEqualTo(
+                "/account/61ca3b12-33f0-47fd-a3be-7db27e10cffa/savings-goals/44457b88-bd9f-4643-ae46-664c9772b151/add-money/123e4568-e89b-12d3-a456-556642440000"))
+                .withRequestBody(WireMock.equalToJson("{"
+                        + "  \"amount\": {"
+                        + "    \"currency\": \"GBP\","
+                        + "    \"minorUnits\": 10"
+                        + "  }"
+                        + "}"))
+                .withHeader("Authorization", containing("Bearer bearerKey"))
+                .willReturn(aResponse().withHeader("Content-Type", "application/json").withStatus(200)
+                        .withBody("{"
+                                + "  \"transferUid\": \"123e4568-e89b-12d3-a456-556642440000\","
+                                + "  \"success\": true,"
+                                + "  \"errors\": []"
+                                + "}")));
+        wireMockServer.stubFor(get(urlPathEqualTo(
+                "/accounts/61ca3b12-33f0-47fd-a3be-7db27e10cffa/balance"))
+                .withHeader("Authorization", containing("Bearer bearerKey"))
+                .willReturn(aResponse().withHeader("Content-Type", "application/json").withStatus(200)
+                        .withBody("{"
+                                + "  \"clearedBalance\": {"
+                                + "    \"currency\": \"GBP\","
+                                + "    \"minorUnits\": 254277"
+                                + "  },"
+                                + "  \"effectiveBalance\": {"
+                                + "    \"currency\": \"GBP\","
+                                + "    \"minorUnits\": 254277"
+                                + "  },"
+                                + "  \"pendingTransactions\": {"
+                                + "    \"currency\": \"GBP\","
+                                + "    \"minorUnits\": 0"
+                                + "  },"
+                                + "  \"acceptedOverdraft\": {"
+                                + "    \"currency\": \"GBP\","
+                                + "    \"minorUnits\": 0"
+                                + "  },"
+                                + "  \"amount\": {"
+                                + "    \"currency\": \"GBP\","
+                                + "    \"minorUnits\": 254277"
+                                + "  },"
+                                + "  \"totalClearedBalance\": {"
+                                + "    \"currency\": \"GBP\","
+                                + "    \"minorUnits\": 254287"
+                                + "  },"
+                                + "  \"totalEffectiveBalance\": {"
+                                + "    \"currency\": \"GBP\","
+                                + "    \"minorUnits\": 254287"
+                                + "  }"
                                 + "}")));
 
         return Map.of("quarkus.rest-client.starling-feed.url", wireMockServer.baseUrl(), "rest-client.auth-key",

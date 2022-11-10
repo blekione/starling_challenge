@@ -2,6 +2,7 @@ package com.blekione.resource;
 
 import java.time.LocalDate;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 import javax.ws.rs.PUT;
@@ -22,17 +23,19 @@ public class SavingsGoalResource {
     SavingsGoalService savingsGoalService;
 
     @PUT
-    @Path("/{accountUid}")
+    @Path("/{accountUid}/category/{categoryUid}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createGoal(@PathParam("accountUid") String accountUid, @QueryParam("fromDate") LocalDate fromDate) throws InterruptedException, ExecutionException {
-        SavingsGoalResponse response = savingsGoalService.createGoal(accountUid, fromDate);
+    public Response createGoal(@PathParam("accountUid") String accountUid, @PathParam("categoryUid") String categoryUid, @QueryParam("fromDate") LocalDate fromDate)
+            throws InterruptedException, ExecutionException {
+        SavingsGoalResponse response = savingsGoalService.createGoal(accountUid, categoryUid, fromDate)
+                .toCompletableFuture().completeOnTimeout(new SavingsGoalResponse(false), 30, TimeUnit.SECONDS).get();
         if (response.isSuccess()) {
-            return Response.ok().entity(new ResponseOne()).build();
+            return Response.ok().entity(response).build();
         }
-        return Response.ok().entity(new ResponseTwo()).build();
+        return Response.status(409).entity(new ErrorResponse()).build();
     }
 
-    public static class  ResponseOne {
+    public static class ResponseOne {
         String message = "created 'Rounding Savings' goal";
 
         public ResponseOne() {
@@ -44,11 +47,10 @@ public class SavingsGoalResource {
         }
     }
 
-    public static class ResponseTwo {
-        String error = "Some error";
+    public static class ErrorResponse {
+        String error = "The Rounding Goal has not been created.";
 
-        public ResponseTwo() {
-            // TODO Auto-generated constructor stub
+        public ErrorResponse() {
         }
 
         public String getError() {
